@@ -1,3 +1,5 @@
+package dice;
+
 public class DieRollRequest {
     private final Integer numberOfRolls;
     private final Integer numberOfFaces;

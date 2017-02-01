@@ -1,7 +1,11 @@
+package dice;
+
 import java.util.function.BiFunction;
 
 public enum BiFunctions {
-    PLUS("+", (left, right) -> left + right);
+    PLUS("+", (left, right) -> left + right),
+    MINUS("-", (left, right) -> left - right)
+    ;
 
     private final String match;
     private final BiFunction<Integer, Integer, Integer> op;

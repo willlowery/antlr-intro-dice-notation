@@ -1,3 +1,7 @@
+package dice;
+
+import dice.DieRollRequest;
+import dice.DieRoller;
 import org.junit.Test;
 
 import java.util.LinkedList;
