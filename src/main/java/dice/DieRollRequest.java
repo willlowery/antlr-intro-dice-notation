@@ -16,4 +16,25 @@ public class DieRollRequest {
     public Integer getNumberOfFaces() {
         return numberOfFaces;
     }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DieRollRequest that = (DieRollRequest) o;
+
+        if (!numberOfRolls.equals(that.numberOfRolls)) return false;
+        return numberOfFaces.equals(that.numberOfFaces);
+
+    }
+
+    public int hashCode() {
+        int result = numberOfRolls.hashCode();
+        result = 31 * result + numberOfFaces.hashCode();
+        return result;
+    }
+
+    public String toString() {
+        return numberOfRolls + "D" + numberOfFaces;
+    }
 }

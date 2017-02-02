@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class Visitor {
+public class Reader {
 
     public void run(String toParse) throws IOException {
 

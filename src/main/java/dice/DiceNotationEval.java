@@ -13,10 +13,10 @@ public class DiceNotationEval {
     }
 
     public Integer eval(Object... objects) {
-        return eval(Arrays.asList(objects));
+        return evalList(Arrays.asList(objects));
     }
 
-    private Integer eval(List<Object> list) {
+    public Integer evalList(List<Object> list) {
         Integer result = 0;
         LinkedList<Object> stack = new LinkedList<>();
         stack.addAll(list);
