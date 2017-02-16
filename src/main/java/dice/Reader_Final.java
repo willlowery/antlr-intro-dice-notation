@@ -1,5 +1,7 @@
 package dice;
 
+import dice.sm.DieExpression;
+import dice.sm.DieExpressionFactory;
 import generated.dice.DiceBaseVisitor;
 import generated.dice.DiceLexer;
 import generated.dice.DiceParser;
@@ -8,15 +10,19 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 public class Reader_Final {
 
-    public List<Object> run(String toParse) throws IOException {
+    private DieExpressionFactory dieExpressionFactory;
+
+    public Reader_Final(DieExpressionFactory dieExpressionFactory) {
+        this.dieExpressionFactory = dieExpressionFactory;
+    }
+
+    public DieExpression run(String toParse) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(toParse.getBytes());
-        return new MyVisitor()
+        return new MyVisitor(dieExpressionFactory)
                 .visitDiceNotation(
                         new DiceParser(
                                 new CommonTokenStream(
@@ -30,35 +36,45 @@ public class Reader_Final {
 
     private static class MyVisitor extends DiceBaseVisitor {
 
+        private DieExpressionFactory dieExpressionFactory;
 
-        public List<Object> visitDiceNotation(DiceParser.DiceNotationContext ctx) {
-            ArrayList<Object> results = new ArrayList<>();
+        public MyVisitor(DieExpressionFactory dieExpressionFactory) {
+            this.dieExpressionFactory = dieExpressionFactory;
+        }
+
+        public DieExpression visitDiceNotation(DiceParser.DiceNotationContext ctx) {
             Iterator<DiceParser.DieOrNumberContext> diceOrNumbers = ctx.dieOrNumber().iterator();
             Iterator<DiceParser.OperatorContext> ops = ctx.operator().iterator();
-            results.add(visitDieOrNumber(diceOrNumbers.next()));
+
+            DieExpression result = visitDieOrNumber(diceOrNumbers.next());
 
             while (diceOrNumbers.hasNext()) {
-                results.add(visitOperator(ops.next()));
-                results.add(visitDieOrNumber(diceOrNumbers.next()));
+                String op = ops.next().getText();
+                if(op.equals("+")){
+                    result = dieExpressionFactory.add(result, visitDieOrNumber(diceOrNumbers.next()));
+                }else if(op.equals("-")){
+                    result = dieExpressionFactory.subtract(result, visitDieOrNumber(diceOrNumbers.next()));
+                }
             }
 
-            return results;
+            return result;
         }
 
         public Object visitOperator(DiceParser.OperatorContext ctx) {
             return BiFunctions.find(ctx.getText());
         }
 
-        public Object visitDieOrNumber(DiceParser.DieOrNumberContext ctx) {
+        public DieExpression visitDieOrNumber(DiceParser.DieOrNumberContext ctx) {
             if (ctx.dieRoll() != null) {
                 return visitDieRoll(ctx.dieRoll());
             } else {
-                return Integer.parseInt(ctx.INTEGER().getText());
+
+                return dieExpressionFactory.constant(Integer.parseInt(ctx.INTEGER().getText()));
             }
         }
 
-        public DieRollRequest visitDieRoll(DiceParser.DieRollContext ctx) {
-            return new DieRollRequest(
+        public DieExpression visitDieRoll(DiceParser.DieRollContext ctx) {
+            return dieExpressionFactory.roll(
                     Integer.parseInt(ctx.INTEGER(0).getText()),
                     Integer.parseInt(ctx.INTEGER(1).getText())
             );

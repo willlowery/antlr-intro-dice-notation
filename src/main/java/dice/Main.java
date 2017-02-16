@@ -1,5 +1,7 @@
 package dice;
 
+import dice.sm.DieExpressionFactory;
+
 import java.io.IOException;
 
 public class Main {
@@ -9,7 +11,7 @@ public class Main {
     }
 
     private static Integer eval(String toParse) throws IOException {
-        return new DiceNotationEval(new DieRoller()).evalList(new Reader_Final().run(toParse));
+        return new Reader_Final(new DieExpressionFactory(new DieRoller())).run(toParse).eval();
     }
 
 }
